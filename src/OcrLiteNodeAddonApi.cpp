@@ -1,5 +1,7 @@
 #include "OcrLite.h"
 #include "tools.h"
+#include <codecvt>
+#include <fstream>
 #include <napi.h>
 #include <opencv2/imgcodecs.hpp>
 
@@ -9,8 +11,8 @@ public:
     RapidOcrOnnx(const Napi::CallbackInfo& info);
     ~RapidOcrOnnx();
 
-    OcrResult Detect(std::string imgFile);
-    OcrResult Detect(void* buf, size_t sz);
+    OcrResult Detect(std::u16string& imgFile);
+    OcrResult Detect(char* buffer, size_t sz);
 
 private:
     OcrLite* ocrLite;
@@ -43,19 +45,25 @@ Napi::Object RapidOcrOnnx::Init(Napi::Env env)
         });
 }
 
-OcrResult RapidOcrOnnx::Detect(std::string imgFile)
+OcrResult RapidOcrOnnx::Detect(std::u16string& imgFile)
 {
-    cv::Mat originSrc = cv::imread(imgFile, cv::IMREAD_COLOR);
+    FILE* fp = _wfopen((wchar_t*)imgFile.c_str(), L"rb");
+    fseek(fp, 0, SEEK_END);
+    size_t size = ftell(fp);
+    char* buffer = new char[size];
+    fseek(fp, 0, SEEK_SET);
+    fread(buffer, 1, size, fp);
+    
+    OcrResult result = Detect(buffer, size);
 
-    OcrResult result
-        = ocrLite->detect(originSrc, padding, maxSideLen, boxScoreThresh, boxThresh, unClipRatio, doAngle, mostAngle);
-    result.strRes[result.strRes.length() - 1] = 0;
+    delete[] buffer;
+    fclose(fp);
 
     return result;
 }
-OcrResult RapidOcrOnnx::Detect(void* buf, size_t sz)
+OcrResult RapidOcrOnnx::Detect(char* buffer, size_t size)
 {
-    cv::_InputArray arr((char*)buf, sz);
+    cv::_InputArray arr(buffer, size);
     cv::Mat originSrc = cv::imdecode(arr, cv::IMREAD_COLOR);
 
     OcrResult result
@@ -87,21 +95,45 @@ RapidOcrOnnx::~RapidOcrOnnx()
 
 class DetectWorker : public Napi::AsyncWorker {
 public:
-    DetectWorker(Napi::Env& env, RapidOcrOnnx* obj, std::string& imgFile, Napi::Promise::Deferred deferred)
+    DetectWorker(Napi::Env& env, Napi::Promise::Deferred deferred, RapidOcrOnnx* obj, std::u16string& imgFile)
         : AsyncWorker(env)
+        , deferred(deferred)
         , obj(obj)
         , imgFile(imgFile)
+    {
+    }
+    DetectWorker(Napi::Env& env, Napi::Promise::Deferred deferred, RapidOcrOnnx* obj, char* data, size_t sz)
+        : AsyncWorker(env)
         , deferred(deferred)
+        , obj(obj)
+        , data(data)
+        , sz(sz)
     {
     }
     ~DetectWorker() { }
-    void Execute() override { result = obj->Detect(imgFile); }
-    void OnOK() override { deferred.Resolve(Napi::String::New(Env(), result.strRes)); }
-    void OnError(const Napi::Error& e) override { deferred.Reject(e.Value()); }
+    void Execute() override
+    {
+        if (sz)
+            result = obj->Detect(data, sz);
+        else
+            result = obj->Detect(imgFile);
+    }
+    void OnOK() override
+    {
+        deferred.Resolve(Napi::String::New(Env(), result.strRes));
+    }
+    void OnError(const Napi::Error& e) override
+    {
+        deferred.Reject(e.Value());
+    }
 
 private:
     RapidOcrOnnx* obj;
-    std::string imgFile;
+
+    std::u16string imgFile;
+    char* data;
+    size_t sz = 0;
+
     OcrResult result;
     Napi::Promise::Deferred deferred;
 };
@@ -109,19 +141,35 @@ private:
 Napi::Value RapidOcrOnnx::detect(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
-    std::string imgFile = info[0].As<Napi::String>().Utf8Value();
-
     Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(env);
-    DetectWorker* worker = new DetectWorker(env, this, imgFile, deferred);
+    DetectWorker* worker;
+    if (info[0].IsTypedArray()) {
+        Napi::Uint8Array arr = info[0].As<Napi::Uint8Array>();
+        char* buffer = (char*)arr.ArrayBuffer().Data();
+        buffer += arr.ByteOffset();
+        size_t size = arr.ByteLength();
+        worker = new DetectWorker(env, deferred, this, buffer, size);
+    } else {
+        std::u16string imgFile = info[0].As<Napi::String>().Utf16Value();
+        worker = new DetectWorker(env, deferred, this, imgFile);
+    }
     worker->Queue();
     return deferred.Promise();
 }
 Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
-    std::string imgFile = info[0].As<Napi::String>().Utf8Value();
-
-    OcrResult result = Detect(imgFile);
+    OcrResult result;
+    if (info[0].IsTypedArray()) {
+        Napi::Uint8Array arr = info[0].As<Napi::Uint8Array>();
+        char* buffer = (char*)arr.ArrayBuffer().Data();
+        buffer += arr.ByteOffset();
+        size_t size = arr.ByteLength();
+        result = Detect(buffer, size);
+    } else {
+        std::u16string imgFile = info[0].As<Napi::String>().Utf16Value();
+        result = Detect(imgFile);
+    }
     return Napi::String::New(env, result.strRes);
 }
 

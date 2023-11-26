@@ -1,4 +1,5 @@
-import Path from 'path';
+import { resolve } from 'path';
+import { isTypedArray } from 'util/types';
 
 declare interface RapidOcrOnnx {
     padding: number;
@@ -11,18 +12,46 @@ declare interface RapidOcrOnnx {
 }
 declare class RapidOcrOnnx {
     constructor(detModel: string, clsModel: string, recModel: string, keyPath: string, threads: number);
-    detect(imgFile: string): Promise<string>;
-    detectSync(imgFile: string): string;
+
+    detect(path: string): Promise<string>;
+    detect(buf: NodeJS.TypedArray): Promise<string>;
+
+    detectSync(path: string): string;
+    detectSync(buf: NodeJS.TypedArray): string;
 }
 
-export = class OCR extends (require('./build/Release/RapidOcrOnnx.node') as typeof RapidOcrOnnx) {
-    constructor() {
-        super(Path.resolve('models/ch_PP-OCRv3_det_infer.onnx'), Path.resolve('models/ch_ppocr_mobile_v2.0_cls_infer.onnx'), Path.resolve('models/ch_PP-OCRv3_rec_infer.onnx'), Path.resolve('models/ppocr_keys_v1.txt'), 3);
+declare interface RapidOcrOnnxOption {
+    detModel: string;
+    clsModel: string;
+    recModel: string;
+    keyPath: string;
+    threads?: number;
+}
+
+class OCR extends (require('./build/Release/RapidOcrOnnx.node') as typeof RapidOcrOnnx) {
+    constructor(option: RapidOcrOnnxOption) {
+        super(
+            resolve(option.detModel),
+            resolve(option.clsModel),
+            resolve(option.recModel),
+            resolve(option.keyPath),
+            option.threads ?? 3,
+        );
     }
-    detect(imgFile: string) {
-        return super.detect(Path.resolve(imgFile));
+    detect(path: string): Promise<string>;
+    detect(buf: NodeJS.TypedArray): Promise<string>;
+    async detect(src: string | NodeJS.TypedArray) {
+        if (isTypedArray(src))
+            return await super.detect(src);
+        return await super.detect(resolve(src));
     }
-    detectSync(imgFile: string) {
-        return super.detectSync(Path.resolve(imgFile));
+    detectSync(path: string): string;
+    detectSync(buf: NodeJS.TypedArray): string;
+    detectSync(src: string | NodeJS.TypedArray) {
+        if (isTypedArray(src))
+            return super.detectSync(src);
+        return super.detectSync(resolve(src));
     }
-};
+}
+
+export = OCR;
