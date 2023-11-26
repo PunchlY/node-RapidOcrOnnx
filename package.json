@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.6.0",
+    "node-addon-api": "^7.0.0"
+  },
+  "binary": {
+    "napi_versions": [
+      7
+    ]
+  }
+}
