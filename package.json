@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "main": "ocr.cjs",
   "scripts": {
     "build": "cmake-js compile"
   },
