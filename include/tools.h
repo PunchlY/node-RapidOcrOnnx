@@ -8,7 +8,7 @@
     }
 #define Setter(name, property, type, transform)                           \
     void name(const Napi::CallbackInfo& info, const Napi::Value &value) { \
-        property = value.To##type().##transform();                        \
+        property = value.To##type().transform();                        \
     }
 
 #define Property_int(property)                            \
