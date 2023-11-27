@@ -1,5 +1,8 @@
 {
   "type": "module",
+  "scripts": {
+    "build": "cmake-js compile"
+  },
   "devDependencies": {
     "@types/node": "^20.6.0",
     "node-addon-api": "^7.0.0"

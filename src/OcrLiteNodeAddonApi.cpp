@@ -1,13 +1,12 @@
 #include "OcrLite.h"
 #include "tools.h"
-#include <codecvt>
 #include <fstream>
 #include <napi.h>
 #include <opencv2/imgcodecs.hpp>
 
 class RapidOcrOnnx : public Napi::ObjectWrap<RapidOcrOnnx> {
 public:
-    static Napi::Object Init(Napi::Env env);
+    static Napi::Function Init(Napi::Env env);
     RapidOcrOnnx(const Napi::CallbackInfo& info);
     ~RapidOcrOnnx();
 
@@ -29,7 +28,7 @@ private:
     Napi::Value detectSync(const Napi::CallbackInfo& info);
 };
 
-Napi::Object RapidOcrOnnx::Init(Napi::Env env)
+Napi::Function RapidOcrOnnx::Init(Napi::Env env)
 {
     return DefineClass(env, "RapidOcrOnnx",
         {
@@ -53,7 +52,7 @@ OcrResult RapidOcrOnnx::Detect(std::u16string& imgFile)
     char* buffer = new char[size];
     fseek(fp, 0, SEEK_SET);
     fread(buffer, 1, size, fp);
-    
+
     OcrResult result = Detect(buffer, size);
 
     delete[] buffer;
@@ -173,6 +172,10 @@ Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
     return Napi::String::New(env, result.strRes);
 }
 
-Napi::Object Init(Napi::Env env, Napi::Object exports) { return RapidOcrOnnx::Init(env); }
+Napi::Object Init(Napi::Env env, Napi::Object exports)
+{
+    exports.Set("RapidOcrOnnx", RapidOcrOnnx::Init(env));
+    return exports;
+}
 
 NODE_API_MODULE(RapidOcrOnnx, Init);

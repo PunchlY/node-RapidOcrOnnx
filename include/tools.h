@@ -4,7 +4,7 @@
 #define Getter(name, property, type)                   \
     Napi::Value name(const Napi::CallbackInfo& info) { \
         Napi::Env env = info.Env();                    \
-        return Napi::##type::New(env, property);       \
+        return Napi::type::New(env, property);       \
     }
 #define Setter(name, property, type, transform)                           \
     void name(const Napi::CallbackInfo& info, const Napi::Value &value) { \

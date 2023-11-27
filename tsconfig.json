@@ -15,5 +15,13 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         "allowSyntheticDefaultImports": true,
+        "outDir": "./dist",
+        "baseUrl": ".",
+        "rootDir": ".",
+        "paths": {
+            "build/Release/RapidOcrOnnx.node": [
+                "RapidOcrOnnx.node",
+            ],
+        }
     }
 }
