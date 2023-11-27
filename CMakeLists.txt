@@ -61,13 +61,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # source
 file(GLOB OCR_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-add_library(${PROJECT_NAME} SHARED ${OCR_SRC} ${CMAKE_JS_SRC})
-target_compile_definitions(${PROJECT_NAME} PRIVATE __CLIB__)
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} ${OnnxRuntime_LIBS} ${OpenCV_LIBS})
+add_library(RapidOcrOnnx SHARED ${OCR_SRC} ${CMAKE_JS_SRC})
+target_compile_definitions(RapidOcrOnnx PRIVATE __CLIB__)
+set_target_properties(RapidOcrOnnx PROPERTIES PREFIX "" SUFFIX ".node")
+target_link_libraries(RapidOcrOnnx ${CMAKE_JS_LIB} ${OnnxRuntime_LIBS} ${OpenCV_LIBS})
 
 if (OCR_ONNX STREQUAL "CUDA")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE __CUDA__)
+    target_compile_definitions(RapidOcrOnnx PRIVATE __CUDA__)
 endif ()
 
 # Windows Link CRT

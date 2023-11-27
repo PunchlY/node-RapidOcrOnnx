@@ -1,4 +1,4 @@
-import OCR from './RapidOcrOnnx.cjs';
+import OCR from './ocr.cjs';
 import fs from 'fs/promises';
 
 setInterval(Function.prototype, -1 >>> 1);

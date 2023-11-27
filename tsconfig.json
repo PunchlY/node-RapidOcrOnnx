@@ -19,9 +19,10 @@
         "baseUrl": ".",
         "rootDir": ".",
         "paths": {
-            "build/Release/RapidOcrOnnx.node": [
-                "RapidOcrOnnx.node",
+            "RapidOcrOnnx": [
+                "./RapidOcrOnnx.cjs",
+                "./build/Release/RapidOcrOnnx.node",
             ],
-        }
+        },
     }
 }

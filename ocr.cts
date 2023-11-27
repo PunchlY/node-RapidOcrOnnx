@@ -1,5 +1,6 @@
 import { resolve } from 'path';
 import { isTypedArray } from 'util/types';
+import { RapidOcrOnnx } from 'RapidOcrOnnx';
 
 declare interface RapidOcrOnnxOption {
     detModel: string;
@@ -9,7 +10,7 @@ declare interface RapidOcrOnnxOption {
     threads?: number;
 }
 
-class OCR extends require('./build/Release/RapidOcrOnnx.node').RapidOcrOnnx {
+class OCR extends RapidOcrOnnx {
     constructor(option: RapidOcrOnnxOption) {
         super(
             resolve(option.detModel),
