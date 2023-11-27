@@ -36,15 +36,15 @@ Napi::Function RapidOcrOnnx::Init(Napi::Env env)
 {
     return DefineClass(env, "RapidOcrOnnx",
         {
-            Instance_Method(detect),
-            Instance_Method(detectSync),
-            Instance_Property(padding),
-            Instance_Property(maxSideLen),
-            Instance_Property(boxScoreThresh),
-            Instance_Property(boxThresh),
-            Instance_Property(unClipRatio),
-            Instance_Property(doAngle),
-            Instance_Property(mostAngle),
+            Instance_Method(RapidOcrOnnx, detect),
+            Instance_Method(RapidOcrOnnx, detectSync),
+            Instance_Property(RapidOcrOnnx, padding),
+            Instance_Property(RapidOcrOnnx, maxSideLen),
+            Instance_Property(RapidOcrOnnx, boxScoreThresh),
+            Instance_Property(RapidOcrOnnx, boxThresh),
+            Instance_Property(RapidOcrOnnx, unClipRatio),
+            Instance_Property(RapidOcrOnnx, doAngle),
+            Instance_Property(RapidOcrOnnx, mostAngle),
         });
 }
 
