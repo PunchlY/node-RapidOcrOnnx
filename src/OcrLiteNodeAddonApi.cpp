@@ -12,7 +12,7 @@ public:
 
 #ifdef _WIN32
     OcrResult Detect(std::u16string& imgFile);
-#elif
+#else
     OcrResult Detect(std::string& imgFile);
 #endif
     OcrResult Detect(char* buffer, size_t sz);
@@ -65,7 +65,7 @@ OcrResult RapidOcrOnnx::Detect(std::u16string& imgFile)
 
     return result;
 }
-#elif
+#else
 OcrResult RapidOcrOnnx::Detect(std::string& imgFile)
 {
     cv::Mat originSrc = cv::imread(imgFile, cv::IMREAD_COLOR);
@@ -119,7 +119,7 @@ public:
         , imgFile(imgFile)
     {
     }
-#elif
+#else
     DetectWorker(Napi::Env& env, Napi::Promise::Deferred deferred, RapidOcrOnnx* obj, std::string& imgFile)
         : AsyncWorker(env)
         , deferred(deferred)
@@ -157,7 +157,7 @@ private:
     RapidOcrOnnx* obj;
 #ifdef _WIN32
     std::u16string imgFile;
-#elif
+#else
     std::string imgFile;
 #endif
     char* data;
@@ -181,7 +181,7 @@ Napi::Value RapidOcrOnnx::detect(const Napi::CallbackInfo& info)
     } else {
 #ifdef _WIN32
         std::u16string imgFile = info[0].As<Napi::String>().Utf16Value();
-#elif
+#else
         std::string imgFile = info[0].As<Napi::String>().Utf8Value();
 #endif
         worker = new DetectWorker(env, deferred, this, imgFile);
@@ -202,7 +202,7 @@ Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
     } else {
 #ifdef _WIN32
         std::u16string imgFile = info[0].As<Napi::String>().Utf16Value();
-#elif
+#else
         std::string imgFile = info[0].As<Napi::String>().Utf8Value();
 #endif
         result = Detect(imgFile);
