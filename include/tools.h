@@ -30,6 +30,6 @@
 #define Method(method) Napi::Value method(const Napi::CallbackInfo& info)
 
 #define Instance_Property(property) InstanceAccessor<&Get_##property, &Set_##property>(#property)
-#define Instance_Method(method) InstanceMethod<&##method>(#method, static_cast< napi_property_attributes >(napi_writable | napi_configurable))
+#define Instance_Method(method) InstanceMethod<&method>(#method, static_cast< napi_property_attributes >(napi_writable | napi_configurable))
 
 #endif //__TOOL_H__
