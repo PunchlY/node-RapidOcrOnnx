@@ -10,7 +10,11 @@ public:
     RapidOcrOnnx(const Napi::CallbackInfo& info);
     ~RapidOcrOnnx();
 
+#ifdef _WIN32
     OcrResult Detect(std::u16string& imgFile);
+#elif
+    OcrResult Detect(std::string& imgFile);
+#endif
     OcrResult Detect(char* buffer, size_t sz);
 
 private:
@@ -44,6 +48,7 @@ Napi::Function RapidOcrOnnx::Init(Napi::Env env)
         });
 }
 
+#ifdef _WIN32
 OcrResult RapidOcrOnnx::Detect(std::u16string& imgFile)
 {
     FILE* fp = _wfopen((wchar_t*)imgFile.c_str(), L"rb");
@@ -60,6 +65,18 @@ OcrResult RapidOcrOnnx::Detect(std::u16string& imgFile)
 
     return result;
 }
+#elif
+OcrResult RapidOcrOnnx::Detect(std::string& imgFile)
+{
+    cv::Mat originSrc = cv::imread(imgFile, cv::IMREAD_COLOR);
+
+    OcrResult result
+        = ocrLite->detect(originSrc, padding, maxSideLen, boxScoreThresh, boxThresh, unClipRatio, doAngle, mostAngle);
+    result.strRes[result.strRes.length() - 1] = 0;
+
+    return result;
+}
+#endif
 OcrResult RapidOcrOnnx::Detect(char* buffer, size_t size)
 {
     cv::_InputArray arr(buffer, size);
@@ -94,6 +111,7 @@ RapidOcrOnnx::~RapidOcrOnnx()
 
 class DetectWorker : public Napi::AsyncWorker {
 public:
+#ifdef _WIN32
     DetectWorker(Napi::Env& env, Napi::Promise::Deferred deferred, RapidOcrOnnx* obj, std::u16string& imgFile)
         : AsyncWorker(env)
         , deferred(deferred)
@@ -101,6 +119,15 @@ public:
         , imgFile(imgFile)
     {
     }
+#elif
+    DetectWorker(Napi::Env& env, Napi::Promise::Deferred deferred, RapidOcrOnnx* obj, std::string& imgFile)
+        : AsyncWorker(env)
+        , deferred(deferred)
+        , obj(obj)
+        , imgFile(imgFile)
+    {
+    }
+#endif
     DetectWorker(Napi::Env& env, Napi::Promise::Deferred deferred, RapidOcrOnnx* obj, char* data, size_t sz)
         : AsyncWorker(env)
         , deferred(deferred)
@@ -128,8 +155,11 @@ public:
 
 private:
     RapidOcrOnnx* obj;
-
+#ifdef _WIN32
     std::u16string imgFile;
+#elif
+    std::string imgFile;
+#endif
     char* data;
     size_t sz = 0;
 
@@ -149,7 +179,11 @@ Napi::Value RapidOcrOnnx::detect(const Napi::CallbackInfo& info)
         size_t size = arr.ByteLength();
         worker = new DetectWorker(env, deferred, this, buffer, size);
     } else {
+#ifdef _WIN32
         std::u16string imgFile = info[0].As<Napi::String>().Utf16Value();
+#elif
+        std::string imgFile = info[0].As<Napi::String>().Utf8Value();
+#endif
         worker = new DetectWorker(env, deferred, this, imgFile);
     }
     worker->Queue();
@@ -166,7 +200,11 @@ Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
         size_t size = arr.ByteLength();
         result = Detect(buffer, size);
     } else {
+#ifdef _WIN32
         std::u16string imgFile = info[0].As<Napi::String>().Utf16Value();
+#elif
+        std::string imgFile = info[0].As<Napi::String>().Utf8Value();
+#endif
         result = Detect(imgFile);
     }
     return Napi::String::New(env, result.strRes);
