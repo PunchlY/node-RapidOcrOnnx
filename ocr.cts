@@ -1,6 +1,6 @@
 import { resolve } from 'path';
 import { isTypedArray } from 'util/types';
-import { RapidOcrOnnx, toString, toJSON } from 'RapidOcrOnnx';
+import RapidOcrOnnx from 'RapidOcrOnnx';
 
 interface Models {
     rootDir?: string;
@@ -35,8 +35,8 @@ class OCR extends RapidOcrOnnx {
     detect(path: string): Promise<string>;
     async detect(src: string | NodeJS.TypedArray) {
         if (isTypedArray(src))
-            return toString(await super.detect(src));
-        return toString(await super.detect(resolve(src)));
+            return await super.detect(src);
+        return await super.detect(resolve(src));
     }
     detectSync(buf: NodeJS.TypedArray): string;
     detectSync(path: string): string;

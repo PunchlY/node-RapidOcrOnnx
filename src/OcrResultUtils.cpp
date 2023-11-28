@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "OcrResultUtils.h"
 #include <napi.h>
 
 PromiseWorker::PromiseWorker(Napi::Promise::Deferred& deferred)

@@ -45,6 +45,7 @@ protected:
     explicit PromiseWorker(Napi::Env& env);
 
     Napi::Promise::Deferred Deferred();
+
 private:
     Napi::Promise::Deferred deferred;
 };

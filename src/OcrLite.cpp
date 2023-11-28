@@ -230,11 +230,11 @@ OcrResult OcrLite::detect(const char *path, const char *imgName,
         imwrite(resultImgFile, textBoxImg);
     }
 
-    std::string strRes;
-    for (auto &textBlock: textBlocks) {
-        strRes.append(textBlock.text);
-        strRes.append("\n");
-    }
+    // std::string strRes;
+    // for (auto &textBlock: textBlocks) {
+    //     strRes.append(textBlock.text);
+    //     strRes.append("\n");
+    // }
 
-    return OcrResult{dbNetTime, textBlocks, textBoxImg, fullTime, strRes};
+    return OcrResult{dbNetTime, textBlocks, textBoxImg, fullTime, /* strRes */};
 }

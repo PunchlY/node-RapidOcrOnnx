@@ -1,6 +1,6 @@
 #include "OcrLite.h"
+#include "OcrResultUtils.h"
 #include "OcrUtils.h"
-#include "utils.h"
 #include "version.h"
 #include <fstream>
 #include <napi.h>
@@ -149,7 +149,6 @@ OcrResult RapidOcrOnnx::Detect(char* buffer, size_t size)
 
     OcrResult result
         = ocrLite->detect(originSrc, padding, maxSideLen, boxScoreThresh, boxThresh, unClipRatio, doAngle, mostAngle);
-    result.strRes[result.strRes.length() - 1] = 0;
 
     return result;
 }
@@ -221,28 +220,20 @@ Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
         std::string imgFile = info[0].As<Napi::String>().Utf8Value();
         result = Detect(imgFile);
     }
-    return Napi::String::New(env, result.strRes);
-}
 
-Napi::String toString(const Napi::CallbackInfo& info)
-{
-    Napi::Env env = info.Env();
-    OcrResult* data = info[0].As<Napi::External<OcrResult>>().Data();
-    return Napi::String::New(env, data->strRes);
-}
-Napi::Object toJSON(const Napi::CallbackInfo& info)
-{
-    Napi::Env env = info.Env();
-    OcrResult* data = info[0].As<Napi::External<OcrResult>>().Data();
-    Napi::Array arr = Napi::Array::New(env);
-    return arr;
+    std::string strRes;
+    for (auto& textBlock : result.textBlocks) {
+        strRes.append(textBlock.text);
+        strRes.append("\n");
+    }
+    strRes[strRes.length() - 1] = 0;
+
+    return Napi::String::New(env, strRes);
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
     exports.Set("RapidOcrOnnx", RapidOcrOnnx::Init(env));
-    exports.Set("toString", Napi::Function::New(env, toString));
-    exports.Set("toJSON", Napi::Function::New(env, toJSON));
     return exports;
 }
 

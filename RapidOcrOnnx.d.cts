@@ -24,7 +24,4 @@ declare class RapidOcrOnnx {
     detectSync(path: string): string;
 }
 
-declare function toString(data: any): string;
-declare function toJSON(data: any): any;
-
-export { RapidOcrOnnx, toString, toJSON };
+export = RapidOcrOnnx;
