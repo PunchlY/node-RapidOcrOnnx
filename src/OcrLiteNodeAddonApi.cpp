@@ -202,10 +202,7 @@ Napi::Value RapidOcrOnnx::detect(const Napi::CallbackInfo& info)
     DetectWorker* worker;
     if (info[0].IsTypedArray()) {
         Napi::Uint8Array arr = info[0].As<Napi::Uint8Array>();
-        char* buffer = (char*)arr.ArrayBuffer().Data();
-        buffer += arr.ByteOffset();
-        size_t size = arr.ByteLength();
-        worker = new DetectWorker(env, this, buffer, size);
+        worker = new DetectWorker(env, this, (char*)arr.ArrayBuffer().Data() + arr.ByteOffset(), arr.ByteLength());
     } else {
         std::string imgFile = info[0].As<Napi::String>().Utf8Value();
         worker = new DetectWorker(env, this, imgFile);
@@ -219,10 +216,7 @@ Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
     OcrResult result;
     if (info[0].IsTypedArray()) {
         Napi::Uint8Array arr = info[0].As<Napi::Uint8Array>();
-        char* buffer = (char*)arr.ArrayBuffer().Data();
-        buffer += arr.ByteOffset();
-        size_t size = arr.ByteLength();
-        result = Detect(buffer, size);
+        result = Detect((char*)arr.ArrayBuffer().Data() + arr.ByteOffset(), arr.ByteLength());
     } else {
         std::string imgFile = info[0].As<Napi::String>().Utf8Value();
         result = Detect(imgFile);

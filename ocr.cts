@@ -14,8 +14,8 @@ interface Models {
 class OCR extends RapidOcrOnnx {
     initModels(models: Models): Promise<boolean>;
     initModels(detModel: string, clsModel: string, recModel: string, keyPath: string): Promise<boolean>;
-    initModels() {
-        if (arguments.length >= 4) return super.initModels(
+    async initModels() {
+        if (arguments.length >= 4) return await super.initModels(
             resolve(arguments[0]),
             resolve(arguments[1]),
             resolve(arguments[2]),
@@ -24,7 +24,7 @@ class OCR extends RapidOcrOnnx {
 
         const models: Models = arguments[0];
         const rootDir = models.rootDir ?? '';
-        return super.initModels(
+        return await super.initModels(
             resolve(rootDir, models.detModel),
             resolve(rootDir, models.clsModel),
             resolve(rootDir, models.recModel),

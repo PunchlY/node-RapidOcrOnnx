@@ -1,6 +1,6 @@
 
 declare interface RapidOcrOnnx {
-    version: string;
+    readonly version: string;
 
     padding: number;
     maxSideLen: number;
