@@ -233,8 +233,7 @@ Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
-    exports.Set("RapidOcrOnnx", RapidOcrOnnx::Init(env));
-    return exports;
+    return RapidOcrOnnx::Init(env);
 }
 
 NODE_API_MODULE(RapidOcrOnnx, Init);
