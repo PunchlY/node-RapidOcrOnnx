@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.6.0",
+    "fastify": "^4.24.3",
     "node-addon-api": "^7.0.0"
   },
   "binary": {
