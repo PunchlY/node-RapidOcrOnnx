@@ -202,7 +202,7 @@ public:
     }
     void Execute() override
     {
-        if (sz)
+        if (data)
             result = obj->Detect(data, sz);
         else
             result = obj->Detect(imgFile);
@@ -215,8 +215,8 @@ public:
 private:
     RapidOcrOnnx* obj;
     std::string imgFile;
-    char* data;
-    size_t sz = 0;
+    char* data = nullptr;
+    size_t sz;
 
     OcrResult result;
 };

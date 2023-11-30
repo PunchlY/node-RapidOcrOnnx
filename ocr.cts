@@ -10,7 +10,6 @@ interface Models {
     keyPath: string;
 }
 
-
 class OCR extends RapidOcrOnnx {
     initModels(models: Models): Promise<boolean>;
     initModels(detModel: string, clsModel: string, recModel: string, keyPath: string): Promise<boolean>;
@@ -45,6 +44,11 @@ class OCR extends RapidOcrOnnx {
             return super.detectSync(src);
         return super.detectSync(resolve(src));
     }
+}
+
+namespace OCR {
+    export type Result = RapidOcrOnnx.Result;
+    export type Results = RapidOcrOnnx.Results;
 }
 
 export = OCR;
