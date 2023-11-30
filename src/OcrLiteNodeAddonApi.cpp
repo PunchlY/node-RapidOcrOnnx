@@ -48,6 +48,7 @@ Napi::Function RapidOcrOnnx::Init(Napi::Env env)
             Instance_Method(RapidOcrOnnx, setNumThread),
             Instance_Method(RapidOcrOnnx, setGpuIndex),
             Instance_Method(RapidOcrOnnx, initModels),
+            Instance_Method(RapidOcrOnnx, initModelsSync),
             Instance_Method(RapidOcrOnnx, detect),
             Instance_Method(RapidOcrOnnx, detectSync),
             Instance_Property(RapidOcrOnnx, padding),
