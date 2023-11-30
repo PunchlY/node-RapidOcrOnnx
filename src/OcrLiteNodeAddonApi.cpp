@@ -14,6 +14,8 @@ public:
 
     OcrResult Detect(std::string& imgFile);
     OcrResult Detect(char* buffer, size_t sz);
+    static Napi::Value OcrResultToJSON(Napi::Env& env, OcrResult& ocrResult);
+    static Napi::Value OcrResultToString(Napi::Env& env, OcrResult& result);
 
 private:
     OcrLite* ocrLite;
@@ -153,13 +155,37 @@ OcrResult RapidOcrOnnx::Detect(char* buffer, size_t size)
     return result;
 }
 
-class DetectWorker : public PromiseWorker {
-    static void OcrResultFinalizeCallback(Napi::Env& env, OcrResult* res)
-    {
-        if (res)
-            delete res;
+Napi::Value RapidOcrOnnx::OcrResultToJSON(Napi::Env& env, OcrResult& result)
+{
+    Napi::Array arr = Napi::Array::New(env);
+    unsigned int i = 0;
+    for (auto& textBlock : result.textBlocks) {
+        Napi::Object block = Napi::Object::New(env);
+        Napi::Array boxes = Napi::Array::New(env);
+        block["text"] = textBlock.text;
+        block["box"] = boxes;
+        block["score"] = textBlock.boxScore;
+        for (int i_box = 0; i_box < 4; i_box++) {
+            Napi::Array box = Napi::Array::New(env);
+            boxes[i_box] = box;
+            box[(unsigned int)0] = textBlock.boxPoint[i_box].x;
+            box[1] = textBlock.boxPoint[i_box].y;
+        }
+        arr[i++] = block;
     }
+    return arr;
+}
+Napi::Value RapidOcrOnnx::OcrResultToString(Napi::Env& env, OcrResult& result)
+{
+    std::string strRes;
+    for (auto& textBlock : result.textBlocks) {
+        strRes.append(textBlock.text);
+        strRes.append("\n");
+    }
+    return Napi::String::New(env, strRes);
+}
 
+class DetectWorker : public PromiseWorker {
 public:
     DetectWorker(Napi::Env& env, RapidOcrOnnx* obj, const std::string& imgFile)
         : PromiseWorker(env)
@@ -183,7 +209,7 @@ public:
     }
     void OnOK() override
     {
-        Deferred().Resolve(Napi::External<OcrResult>::New(Env(), new OcrResult(result), OcrResultFinalizeCallback));
+        Deferred().Resolve(RapidOcrOnnx::OcrResultToJSON(Env(), result));
     }
 
 private:
@@ -221,14 +247,7 @@ Napi::Value RapidOcrOnnx::detectSync(const Napi::CallbackInfo& info)
         result = Detect(imgFile);
     }
 
-    std::string strRes;
-    for (auto& textBlock : result.textBlocks) {
-        strRes.append(textBlock.text);
-        strRes.append("\n");
-    }
-    strRes[strRes.length() - 1] = 0;
-
-    return Napi::String::New(env, strRes);
+    return OcrResultToJSON(env, result);
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports)

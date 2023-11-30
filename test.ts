@@ -1,7 +1,7 @@
 import OCR from './ocr.cjs';
 import fs from 'fs/promises';
 
-setInterval(Function.prototype, -1 >>> 1);
+// setInterval(Function.prototype, -1 >>> 1);
 
 const ocr = new OCR();
 await ocr.initModels({
@@ -21,6 +21,6 @@ await ocr.initModels({
 console.log(ocr.version);
 // console.log(ocr.detectSync('images/1.jpg'));
 
-ocr.detect('images/1.jpg').then(console.log).catch(console.error);
+ocr.detect('images/1.jpg').then(JSON.stringify).then(console.log).catch(console.error);
 
 // ocr.detect(await fs.readFile('images/1.jpg')).then(console.log).catch(console.error);

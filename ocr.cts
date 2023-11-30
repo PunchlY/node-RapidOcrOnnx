@@ -31,15 +31,15 @@ class OCR extends RapidOcrOnnx {
             resolve(rootDir, models.keyPath)
         );
     }
-    detect(buf: NodeJS.TypedArray): Promise<string>;
-    detect(path: string): Promise<string>;
+    detect(buf: NodeJS.TypedArray): Promise<RapidOcrOnnx.Results>;
+    detect(path: string): Promise<RapidOcrOnnx.Results>;
     async detect(src: string | NodeJS.TypedArray) {
         if (isTypedArray(src))
             return await super.detect(src);
         return await super.detect(resolve(src));
     }
-    detectSync(buf: NodeJS.TypedArray): string;
-    detectSync(path: string): string;
+    detectSync(buf: NodeJS.TypedArray): RapidOcrOnnx.Results;
+    detectSync(path: string): RapidOcrOnnx.Results;
     detectSync(src: string | NodeJS.TypedArray) {
         if (isTypedArray(src))
             return super.detectSync(src);

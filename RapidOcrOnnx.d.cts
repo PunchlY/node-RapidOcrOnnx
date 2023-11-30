@@ -17,11 +17,20 @@ declare class RapidOcrOnnx {
     setNumThread(threads: number): void;
     setGpuIndex(gpuIndex: number): void;
 
-    detect(buf: NodeJS.TypedArray): Promise<any>;
-    detect(path: string): Promise<any>;
+    detect(buf: NodeJS.TypedArray): Promise<RapidOcrOnnx.Results>;
+    detect(path: string): Promise<RapidOcrOnnx.Results>;
 
-    detectSync(buf: NodeJS.TypedArray): string;
-    detectSync(path: string): string;
+    detectSync(buf: NodeJS.TypedArray): RapidOcrOnnx.Results;
+    detectSync(path: string): RapidOcrOnnx.Results;
+}
+declare namespace RapidOcrOnnx {
+    interface Result {
+        text: string;
+        block: [[number, number], [number, number], [number, number], [number, number]];
+        score: number;
+    }
+    interface Results extends Array<Result> {
+    }
 }
 
 export = RapidOcrOnnx;
