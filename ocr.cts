@@ -30,6 +30,27 @@ class OCR extends RapidOcrOnnx {
             resolve(rootDir, models.keyPath)
         );
     }
+
+    initModelsSync(models: Models): boolean;
+    initModelsSync(detModel: string, clsModel: string, recModel: string, keyPath: string): boolean;
+    initModelsSync() {
+        if (arguments.length >= 4) return super.initModelsSync(
+            resolve(arguments[0]),
+            resolve(arguments[1]),
+            resolve(arguments[2]),
+            resolve(arguments[3])
+        );
+
+        const models: Models = arguments[0];
+        const rootDir = models.rootDir ?? '';
+        return super.initModelsSync(
+            resolve(rootDir, models.detModel),
+            resolve(rootDir, models.clsModel),
+            resolve(rootDir, models.recModel),
+            resolve(rootDir, models.keyPath)
+        );
+    }
+
     detect(buf: NodeJS.TypedArray): Promise<RapidOcrOnnx.Results>;
     detect(path: string): Promise<RapidOcrOnnx.Results>;
     async detect(src: string | NodeJS.TypedArray) {
@@ -37,6 +58,7 @@ class OCR extends RapidOcrOnnx {
             return await super.detect(src);
         return await super.detect(resolve(src));
     }
+
     detectSync(buf: NodeJS.TypedArray): RapidOcrOnnx.Results;
     detectSync(path: string): RapidOcrOnnx.Results;
     detectSync(src: string | NodeJS.TypedArray) {

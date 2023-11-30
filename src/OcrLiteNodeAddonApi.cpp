@@ -35,6 +35,7 @@ private:
     void setNumThread(const Napi::CallbackInfo& info);
     void setGpuIndex(const Napi::CallbackInfo& info);
     Napi::Value initModels(const Napi::CallbackInfo& info);
+    Napi::Value initModelsSync(const Napi::CallbackInfo& info);
     Napi::Value detect(const Napi::CallbackInfo& info);
     Napi::Value detectSync(const Napi::CallbackInfo& info);
 };
@@ -110,6 +111,7 @@ private:
 
     bool result;
 };
+
 Napi::Value RapidOcrOnnx::initModels(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
@@ -122,6 +124,18 @@ Napi::Value RapidOcrOnnx::initModels(const Napi::CallbackInfo& info)
     InitModelsWorker* worker = new InitModelsWorker(env, ocrLite, szDetModel, szClsModel, szRecModel, szKeyPath);
     worker->Queue();
     return worker->Promise();
+}
+Napi::Value RapidOcrOnnx::initModelsSync(const Napi::CallbackInfo& info)
+{
+    Napi::Env env = info.Env();
+
+    std::string szDetModel = info[0].As<Napi::String>().Utf8Value();
+    std::string szClsModel = info[1].As<Napi::String>().Utf8Value();
+    std::string szRecModel = info[2].As<Napi::String>().Utf8Value();
+    std::string szKeyPath = info[3].As<Napi::String>().Utf8Value();
+
+    bool result = ocrLite->initModels(szDetModel, szClsModel, szRecModel, szKeyPath);
+    return Napi::Boolean::New(env, result);
 }
 
 OcrResult RapidOcrOnnx::Detect(std::string& imgFile)

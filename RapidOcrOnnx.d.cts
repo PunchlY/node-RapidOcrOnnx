@@ -14,6 +14,7 @@ declare class RapidOcrOnnx {
     constructor();
 
     initModels(detModel: string, clsModel: string, recModel: string, keyPath: string): Promise<boolean>;
+    initModelsSync(detModel: string, clsModel: string, recModel: string, keyPath: string): boolean;
     setNumThread(threads: number): void;
     setGpuIndex(gpuIndex: number): void;
 
