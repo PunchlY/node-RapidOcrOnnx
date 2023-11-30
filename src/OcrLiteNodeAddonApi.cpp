@@ -14,8 +14,8 @@ public:
 
     OcrResult Detect(std::string& imgFile);
     OcrResult Detect(char* buffer, size_t sz);
-    static Napi::Value OcrResultToJSON(Napi::Env& env, OcrResult& ocrResult);
-    static Napi::Value OcrResultToString(Napi::Env& env, OcrResult& result);
+    static Napi::Value OcrResultToJSON(Napi::Env& env, OcrResult ocrResult);
+    static Napi::Value OcrResultToString(Napi::Env& env, OcrResult result);
 
 private:
     OcrLite* ocrLite;
