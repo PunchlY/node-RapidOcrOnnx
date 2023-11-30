@@ -155,7 +155,7 @@ OcrResult RapidOcrOnnx::Detect(char* buffer, size_t size)
     return result;
 }
 
-Napi::Value RapidOcrOnnx::OcrResultToJSON(Napi::Env& env, OcrResult& result)
+Napi::Value RapidOcrOnnx::OcrResultToJSON(Napi::Env& env, OcrResult result)
 {
     Napi::Array arr = Napi::Array::New(env);
     unsigned int i = 0;
@@ -175,7 +175,7 @@ Napi::Value RapidOcrOnnx::OcrResultToJSON(Napi::Env& env, OcrResult& result)
     }
     return arr;
 }
-Napi::Value RapidOcrOnnx::OcrResultToString(Napi::Env& env, OcrResult& result)
+Napi::Value RapidOcrOnnx::OcrResultToString(Napi::Env& env, OcrResult result)
 {
     std::string strRes;
     for (auto& textBlock : result.textBlocks) {
