@@ -21,8 +21,6 @@ fastify.post('/', async (request, reply) => {
     reply.code(400);
 });
 
-fastify.addContentTypeParser('*', { parseAs: 'buffer' }, async (request: any, payload: Buffer) => {
-    return payload;
-});
+fastify.addContentTypeParser('*', { parseAs: 'buffer' }, async (request: any, payload: Buffer) => payload);
 
 await fastify.listen({ port: 3000 });
